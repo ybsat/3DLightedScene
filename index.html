@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>JT_Multi-Shader</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/monolith.min.css" integrity="sha384-nMsyCPWxTxXHTFIKUPqZfdmDiZMXgicmSZGBd+MxPN9jk3ecTDHcDc0uZz7jwX4F" crossorigin="anonymous">
+    <link rel="stylesheet"  href="css/style.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  </head>
+
+  <body onload="main()" onresize="drawResize()" style="background-color:#F5F5DC;">
+    <canvas id="webgl" width="600" height="600">
+    Please use a browser that supports "canvas"
+    </canvas>
+
+    <div class="container-fluid">
+        <div class="col-md-2 text-center">
+          <div class="row">
+            <p><strong>Keyboard</strong></p>
+          </div>
+          <div class="row">
+            <p>Move in space (strafe, fly)</p>
+          </div>
+          <div class="row">
+            <p><b>WSAD</b> keys</p>
+          </div>
+          <div class="row">
+            <p>Move head (tilt, rotate)</p>
+          </div>
+          <div class="row">
+            <p><b>IJKL</b> keys</p>
+          </div>
+        </div>
+
+        <div class="col-md-3 text-center">
+          <div class="row">
+            <div class="col-md-6">
+              <div><label>Shading</label></div>
+              <div><select onchange="changeShading()" id="shading-mode">
+                <option value="1" selected>Gouraud</option>
+                <option value="2">Phong</option>
+              </select></div>
+            </div>
+            <div class="col-md-6">
+              <label>Lighting</label>
+              <div><select onchange="changeLighting()" id="light-mode">
+                <option value="0" selected>Phong</option>
+                <option value="1">Blinn-Phong</option>
+              </select></div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div><label>Sphere</label></div>
+              <div><select onchange="setMat0(this.value)" id="shape0-mat"></select></div>
+            </div>
+            <div class="col-md-6">
+              <div><label>Bat</label></div>
+              <div><select onchange="setMat1(this.value)" id="shape1-mat"></select></div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div><label>Pyramid</label></div>
+              <div><select onchange="setMat2(this.value)" id="shape2-mat"></select></div>
+            </div>
+            <div class="col-md-6">
+              <div><label>Cubicles</label></div>
+              <div><select onchange="setMat3(this.value)" id="shape3-mat"></select></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-2 text-center">
+          <div class="row">
+            <p><strong>Headlight:</strong>
+              <button type="button" onclick="headLightOnOff()" id="hlo">on</button>
+            </p>
+          </div>
+          <div class="row">
+            <div class="col-md-4">
+              <p>Ambient:</p>
+            </div>
+            <div class="col-md-4">
+              <div class="picker-container" id="hac"></div>
+            </div>
+            <div class="col-md-4">
+              <p><button type="button" onclick="headAmbientOnOff()" id="hao">on</button></p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-4">
+              <p>Diffuse:</p>
+            </div>
+            <div class="col-md-4">
+              <div class="picker-container" id="hdc"></div>
+            </div>
+            <div class="col-md-4">
+              <p><button type="button" onclick="headDiffuseOnOff()" id="hdo">on</button></p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-4">
+              <p>Spectral:</p>
+            </div>
+            <div class="col-md-4">
+              <div class="picker-container" id="hsc"></div>
+            </div>
+            <div class="col-md-4">
+              <p><button type="button" onclick="headSpectralOnOff()" id="hso">on</button></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-2 text-center">
+          <div class="row">
+            <p><strong>Worldlight</strong>
+              <button type="button" onclick="worldLightOnOff()" id="wlo">on</button>
+            </p>
+          </div>
+          <div class="row">
+            <div class="col-md-4">
+              <p>Ambient:</p>
+            </div>
+            <div class="col-md-4">
+              <div class="picker-container" id="wac"></div>
+            </div>
+            <div class="col-md-4">
+              <p><button type="button" onclick="worldAmbientOnOff()" id="wao">on</button></p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-4">
+              <p>Diffuse:</p>
+            </div>
+            <div class="col-md-4">
+              <div class="picker-container" id="wdc"></div>
+            </div>
+            <div class="col-md-4">
+              <p><button type="button" onclick="worldDiffuseOnOff()" id="wdo">on</button></p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-4">
+              <p>Spectral:</p>
+            </div>
+            <div class="col-md-4">
+              <div class="picker-container" id="wsc"></div>
+            </div>
+            <div class="col-md-4">
+              <p><button type="button" onclick="worldSpectralOnOff()" id="wso">on</button></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-3 text-center">
+          <div class="row" style="height: 35px;">
+            <p><strong>Worldlight Position</strong></p>
+          </div>
+          <div class="row" style="height: 35px;">
+            <div class="col-md-12">
+              <label for"xpos" id="xpos">X: 1</label>
+              <div style="display: inline-block;">
+                <input type="range" min="-10" max="10" step="0.1" value="1" id="xpos" onchange="updateLightPos(this.value,0)">
+              </div>
+            </div>
+          </div>
+          <div class="row" style="height: 35px;">
+            <div class="col-md-12">
+              <label for"ypos" id="ypos">Y: 1</label>
+              <div style="display: inline-block;">
+                <input type="range" min="-10" max="10" step="0.1" value="1" onchange="updateLightPos(this.value,1)">
+              </div>
+            </div>
+          </div>
+          <div class="row" style="height: 35px;">
+            <div class="col-md-12">
+              <label for"zpos" id="zpos">Z: 1</label>
+              <div style="display: inline-block;">
+                <input type="range" min="-10" max="10" step="0.1" value="1" onchange="updateLightPos(this.value,2)">
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js" integrity="sha384-yPOMoHaLeQp28wxaHe5Uar7t2ZOrsLmQXAbD/sJcwWJB/kiR0VLN4UrIKRh8ojp0" crossorigin="anonymous"></script>
+    <script src="lib/webgl-utils.js"></script>
+    <script src="lib/webgl-debug.js"></script>
+    <script src="lib/cuon-utils.js"></script>
+    <script src="lib/cuon-matrix-quat03.js"></script>
+    <script src="js/materials.js"></script>
+    <script src="js/lights.js"></script>
+    <script src="js/makeShapes.js"></script>
+		<script src="js/VBObox0.js"></script>
+    <script src="js/VBObox1.js"></script>
+    <script src="js/VBObox2.js"></script>
+    <script src="js/main.js"></script>
+  </body>
+</html>
